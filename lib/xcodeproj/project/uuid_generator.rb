@@ -69,18 +69,24 @@ module Xcodeproj
         return existing if @paths_by_object.key?(object)
         @paths_by_object[object] = path.size > existing.size ? path : existing
 
-        object.to_one_attributes.each do |attrb|
+        sth1 = object.to_one_attributes
+        sth2 = object.to_many_attributes
+        sth3 = object.references_by_keys_attributes
+
+
+        object.to_one_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
           obj = attrb.get_value(object)
           generate_paths(obj, path + '/' << attrb.plist_name) if obj
         end
 
-        object.to_many_attributes.each do |attrb|
-          attrb.get_value(object).each do |o|
+        object.to_many_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
+          sth4 = attrb.get_value(object)
+          attrb.get_value(object).sort.each do |o|
             generate_paths(o, path + '/' << attrb.plist_name << "/#{path_component_for_object(o)}")
           end
         end
 
-        object.references_by_keys_attributes.each do |attrb|
+        object.references_by_keys_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
           attrb.get_value(object).each do |dictionary|
             dictionary.each do |key, value|
               generate_paths(value, path + '/' << attrb.plist_name << "/k:#{key}/#{path_component_for_object(value)}")

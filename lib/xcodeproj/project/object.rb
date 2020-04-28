@@ -439,22 +439,22 @@ module Xcodeproj
           hash['displayName'] = display_name
           hash['isa'] = isa
 
-          simple_attributes.each do |attrb|
+          simple_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
             value = attrb.get_value(self)
             hash[attrb.plist_name] = value if value
           end
 
-          to_one_attributes.each do |attrb|
+          to_one_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
             obj = attrb.get_value(self)
             hash[attrb.plist_name] = obj.to_tree_hash if obj
           end
 
-          to_many_attributes.each do |attrb|
+          to_many_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
             list = attrb.get_value(self)
             hash[attrb.plist_name] = list.map(&:to_tree_hash)
           end
 
-          references_by_keys_attributes.each do |attrb|
+          references_by_keys_attributes.sort_by{|e| [e.name, e.owner]}.each do |attrb|
             list = attrb.get_value(self)
             hash[attrb.plist_name] = list.map(&:to_tree_hash)
           end
